@@ -21,9 +21,15 @@ import re
 import urllib2
 import gzip
 from StringIO import StringIO
+import argparse
+
+parser = argparse.ArgumentParser(description='Script for IMDB ratings parsing',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+parser.add_argument('--minvotes', help='minimum number of votes needed', default=10000, type=int)
+args = parser.parse_args()
 
 # minimum number of votes needed to be added in the database
-min_votes = 10000
+min_votes = args.minvotes
 # regular expression for a single line in the ratings file
 # there are a few movies where this expression doesn't work, but
 # these movies shouldn't be part of our small dataset anyway
