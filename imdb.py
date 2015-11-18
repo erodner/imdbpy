@@ -1,7 +1,7 @@
 """ The following script downloads IMDB ratings and
     saves a part of these results as a JSON file.
     The author of the script does not take any warranty for
-    the damage this script my cause.
+    the damage this script might cause.
 
     Author: Erik Rodner (2015)
 """
