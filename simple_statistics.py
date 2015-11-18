@@ -3,12 +3,19 @@ import argparse
 parser = argparse.ArgumentParser(description='Script for simple movie statistics',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('input', help='input JSON file')
+parser.add_argument('--movie', help='specific movie for which sequels are shown', default='Demagogue')
 args = parser.parse_args()
 
 import json
 
 with open(args.input, 'r') as f:
     db = json.load(f)
+
+# find a specific movie
+for movie in db['movies']:
+    t = movie['title']
+    if t.find(args.movie)==0:
+        print ("{} ({}): {}".format(movie['title'], movie['year'], movie['rating']))
 
 # get the best movie
 max_rating = -1.0
