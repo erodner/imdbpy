@@ -23,9 +23,14 @@ import gzip
 from StringIO import StringIO
 import argparse
 
+mirrors = {'berlin': 'ftp://ftp.fu-berlin.de/pub/misc/movies/database/ratings.list.gz',
+           'sweden': 'ftp://ftp.sunet.se/pub/tv+movies/imdb/ratings.list.gz',
+           'finland': 'ftp://ftp.funet.fi/pub/mirrors/ftp.imdb.com/pub/ratings.list.gz'}
+
 parser = argparse.ArgumentParser(description='Script for IMDB ratings parsing',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('--minvotes', help='minimum number of votes needed', default=10000, type=int)
+parser.add_argument('--mirror', help='specify mirror site to use', choices=mirrors.keys(), default='berlin')
 args = parser.parse_args()
 
 # minimum number of votes needed to be added in the database
@@ -40,7 +45,7 @@ episode_pattern = '^\s*\{(.+?)\}\s*$'
 episode_numbers_pattern = '\(#(\d+)\.(\d+)\)\s*$'
 # URL to the ratings file we are downloading
 # http://www.imdb.com/interfaces
-ratings_link = 'ftp://ftp.fu-berlin.de/pub/misc/movies/database/ratings.list.gz'
+ratings_link = mirrors[args.mirror]
 
 #
 #
@@ -65,6 +70,8 @@ episodes = {}
 movies_set = set()
 copying_policy_section = False
 
+rating_error = 0.0
+rating_error_num = 0
 for line in f:
     # display a small progress bar
     line_count += 1
@@ -88,6 +95,7 @@ for line in f:
         # "2" 20-29% of the votes  "6" 60-69% of the votes  "*" 100%   of the votes
 
         vote_sum = 0.0
+        mean_rating = 0.0
         single_votes = []
         for index, l in enumerate(list(distribution)):
             if l == '.':
@@ -97,9 +105,14 @@ for line in f:
             else:
                 p = (int(l)*10 + 5)/100.0
             vote_sum += p
+            mean_rating += p*(index+1)
             single_votes.append(p)
 
+        mean_rating /= vote_sum
         single_votes = [ v/vote_sum for v in single_votes ]
+
+        rating_error += abs(mean_rating - rating)
+        rating_error_num += 1
 
         stats = {'votes': number_of_votes, 'rating': rating, 'year': year,
                 'title': title, 'distribution': single_votes}
@@ -137,8 +150,10 @@ for line in f:
             copyright += line
 
 # print some statistics
-print "Number of movies in the database: {}".format(len(movies))
-print "Number of series in the database: {}".format(len(episodes))
+rating_error /= rating_error_num
+print ("Error for the rating estimation according to the distribution: {}".format(rating_error))
+print ("Number of movies in the database: {}".format(len(movies)))
+print ("Number of series in the database: {}".format(len(episodes)))
 
 # output the resulting dataset subset in a json file together
 # with the copyright
