@@ -21,14 +21,14 @@ def sample_rating_distribution(rating):
 def sample_votes(min_votes=10000):
     votes = 0
     while votes < min_votes:
-        votes = random.expovariate(1.0/10000)
+        votes = random.expovariate(1.0/50000)
     return int(votes)
 
 def sample_movie(min_votes=10000):
     m = {}
 
     # rating
-    m['rating'] = min(max(round(random.normalvariate(4.5, 1.2), 1),1.0),10.0)
+    m['rating'] = min(max(round(random.normalvariate(4.5, 1.6), 1),1.0),10.0)
 
     # number of votes (votes)
     m['votes'] = sample_votes(min_votes)
