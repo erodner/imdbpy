@@ -17,6 +17,11 @@ for movie in db['movies']:
     if t.find(args.movie)==0:
         print ("{} ({}): {}".format(movie['title'], movie['year'], movie['rating']))
 
+# movies for 2017
+for movie in db['movies']:
+    if movie['year']==2017:
+        print ("{} ({})".format(movie['title'], movie['year']))
+
 # get the best movie
 max_rating = -1.0
 for movie in db['movies']:
@@ -43,3 +48,16 @@ for movie in db['movies']:
 for y in sum_rating_per_year:
     print ("mean rating in {} ({} movies): {}".format(y,
         num_movies_per_year[y], sum_rating_per_year[y]/num_movies_per_year[y]))
+
+# maximally diverse votes
+max_var_rating = -1
+for movie in db['movies']:
+    mean_rating = sum([ d * (index+1) for index, d in enumerate(movie['distribution']) ])
+    var_rating = sum([d * (index+1-mean_rating)**2 for index, d in enumerate(movie['distribution'])])
+    if var_rating > max_var_rating:
+        max_var_rating = var_rating
+        diverse_movie = movie
+
+from pprint import pprint
+print ("The movie with the most diverse ratings is: {}".format(diverse_movie['title']))
+print ("Ratings are {}".format(diverse_movie['distribution']))
