@@ -111,6 +111,8 @@ for line in f:
         mean_rating /= vote_sum
         single_votes = [ v/vote_sum for v in single_votes ]
 
+        #weighted_rank = (number_of_votes/(number_of_votes+25000.0))*mean_rating + (25000.0/(number_of_votes+25000.0))*6.9
+
         rating_error += abs(mean_rating - rating)
         rating_error_num += 1
 
